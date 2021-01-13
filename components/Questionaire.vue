@@ -8,6 +8,7 @@
       <input type="text" class="form-input" placeholder="Insurance" id="insurance" name="insurance">
       <input type="text" class="form-input" placeholder="Phone Number" id="phone_no" name="phone_no">
       <input type="text" class="form-input" placeholder="Email Address" id="email" name="email">
+      <input type="text" class="form-input" placeholder="Vaccine Type" id="vaccine_type" name="vaccine_type">
 
     <!-- Calendly inline widget begin -->
     <div class="calendly-inline-widget" data-url="https://calendly.com/vamshi-adimulam/testing?hide_event_type_details=1&hide_gdpr_banner=1" style="min-width:320px;height:630px;"></div>
