@@ -1,39 +1,19 @@
 <template>
   <div class="container">
-    <div>
-      <logo />
-      <h1 class="title">
-        nuxtjs
-      </h1>
-      <h2 class="subtitle">
-        My astonishing Nuxt.js project
-      </h2>
-      <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          class="button--green"
-        >
-          Documentation
-        </a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          class="button--grey"
-        >
-          GitHub
-        </a>
-      </div>
-    </div>
+      <location></location>
+      <maps></maps>
+      <questionaire></questionaire>
   </div>
 </template>
 
 <script>
-import Logo from '~/components/Logo.vue'
+import Location from '~/components/Location.vue';
+import Maps from '~/components/Maps.vue';
+import Questionaire from '~/components/Questionaire.vue';
 
 export default {
   components: {
-    Logo
+    Location, Maps, Questionaire
   }
 }
 </script>
@@ -46,6 +26,7 @@ export default {
   justify-content: center;
   align-items: center;
   text-align: center;
+  flex-direction: column;
 }
 
 .title {

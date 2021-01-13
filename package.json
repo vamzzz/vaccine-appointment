@@ -10,7 +10,8 @@
     "start": "nuxt start"
   },
   "dependencies": {
-    "nuxt": "^2.0.0"
+    "nuxt": "^2.14.12",
+    "vue2-google-maps": "^0.10.7"
   },
   "devDependencies": {
     "nodemon": "^1.18.9"
