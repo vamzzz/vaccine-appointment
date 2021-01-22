@@ -1,36 +1,30 @@
 <template>
   <div>
-    <div id="input-container">
-        <label>
-            <gmap-autocomplete
-                class="auto-complete"
-                @place_changed="setPlace">
-            </gmap-autocomplete>
-            <button @click="addMarker">Add</button>
-        </label>
-    </div>
-    <GmapMap
-        :center="currentPlace"
-        :zoom="14"
-        map-type-id="roadmap"
-        style="width: 1500px; height: 800px;"
-        >
-            <GmapMarker
-                :key="index"
-                v-for="(m, index) in markers"
-                :position="m.position"
-                :label="m.position.full_name"
-                :clickable="true"
-                @click="center=m.position"
-                :icon="{url: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'}"
-            ></GmapMarker>
-    </GmapMap>
-
+      <div v-if="currentPlace">
+          <h3>Nearest Covid Vaccinations</h3>
+           <GmapMap
+                :center="currentPlace"
+                :zoom="14"
+                map-type-id="roadmap"
+                style="width: 1500px; height: 800px;"
+                >
+                    <GmapMarker
+                        :key="index"
+                        v-for="(m, index) in new_markers"
+                        :position="m"
+                        :label="m.full_name"
+                        :clickable="true"
+                        @click="setLocation(m)"
+                        :icon="{url: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'}"
+                    ></GmapMarker>
+            </GmapMap>
+      </div>
   </div>
 </template>
 
 <script>
 import * as VueGoogleMaps from 'vue2-google-maps';
+import {mapGetters, mapMutations} from 'vuex';
 
 export default {
     name: 'Maps',
@@ -44,20 +38,39 @@ export default {
             center: { lat: 45.508, lng: -73.587 },
             markers: [{position:{full_name: "My House",lat:34.067680, lng:-84.235060}}],
             places: [],
-            currentPlace: {lat:34.067680, lng:-84.235060}
+            vaccineLocations: [],
+            selectedLocation: {},
         }
     },
+
+    computed: {
+        ...mapGetters([
+            'currentPlace'
+        ]),
+        new_markers() {
+            return this.vaccineLocations.map(location => {
+                return {
+                    full_name: location['Location Name'],
+                    lat: location['Latitude'],
+                    lng: location['Longitude']
+                }
+            })
+        }
+    },
+    
     mounted() {
         this.geolocate();
     },
 
     methods: {
-        // receives a place object via the autocomplete component
-        setPlace(place) {
-            if (place) {
-                this.currentPlace = {lat:place.geometry.location.lat(), lng:place.geometry.location.lng()};
-            }
+        ...mapMutations([
+            'setPageSelected'
+        ]),
+
+        setLocation(selectedLocation) {
+            this.selectedLocation = selectedLocation;
         },
+        // receives a place object via the autocomplete component
         addMarker() {
             if (this.currentPlace) {
                 const marker = {
@@ -77,8 +90,27 @@ export default {
                 lng: position.coords.longitude
                 };
             });
-        }
-    }
+        },
+
+        getAirtableDataLocations() {
+            let locations = [];
+            let Airtable = require('airtable');
+            let base = new Airtable({apiKey: "keyhqvUJ2Ts3Vcv4j"}).base('appedNK5Mm6LH7rVD');
+            base('Locations').select({view: "Grid view"})
+                .eachPage(function page(records, fetchNextPage) {
+                    records.forEach(function(record) {
+                        if (record.fields['Ready'] === 'Ready') {
+                            locations.push(record.fields);
+                        }
+                    });
+                    fetchNextPage();
+                });
+            return locations;
+        },
+    },
+    async created() {
+        this.vaccineLocations = await this.getAirtableDataLocations();
+    },
 }
 </script>
 
@@ -86,10 +118,7 @@ export default {
     #input-container {
         margin-bottom: 50px;
     }
-    .auto-complete {
-        width: 1000px;
-        height: 50px;
-    }
+    
     #location {
         width: 1000px;
         height: 50px;
